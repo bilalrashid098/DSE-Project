@@ -18,12 +18,101 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background-color: #272935;
+}
+
+.input-search {
+  height: 4.0625rem;
+  padding: 1rem 2rem;
+  background-color: transparent;
+  border: 2px solid #ffffff !important;
+  border-radius: 1rem;
+}
+
+.input-search:hover,
+.input-search:focus,
+.input-search:active {
+  box-shadow: none;
+  outline: none;
+}
+
+.img-ring {
+  position: absolute;
+  background-color: transparent;
+  border: 2px dashed #ffffff;
+  border-radius: 100%;
+}
+
+.img-ring.ring1 {
+  left: -20px;
+  top: -20px;
+  width: calc(100% + 40px);
+  height: calc(100% + 40px);
+}
+
+.img-ring.ring2 {
+  left: -40px;
+  top: -40px;
+  width: calc(100% + 80px);
+  height: calc(100% + 80px);
+}
+
+.img-ring.ring3 {
+  left: -60px;
+  top: -60px;
+  width: calc(100% + 120px);
+  height: calc(100% + 120px);
+}
+
+.img-ring::before {
+  position: relative;
+  display: block;
+  height: 15px;
+  width: 15px;
+  background-color: #ffffff;
+  content: "";
+  border-radius: 100%;
+  margin-left: calc(50% - 7.5px);
+  margin-top: -7.5px;
+}
+
+.ring1 {
+  animation: rotateNormal 5s linear infinite;
+}
+
+.ring2 {
+  animation: rotate2x 5s linear infinite;
+}
+
+.ring3 {
+  animation: rotate3x 5s linear infinite;
+}
+
+@keyframes rotateNormal {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rotate2x {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(720deg);
+  }
+}
+
+@keyframes rotate3x {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(1080deg);
+  }
 }
 
 @layer utilities {

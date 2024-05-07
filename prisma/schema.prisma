@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = ""
+}
+
+model blogs {
+  id          String   @id @default(cuid()) @map("_id")
+  author      String?
+  date        String?
+  text        String?
+  title       String?
+  wordcount   String?
+  time        String?
+  CurrentAffairs Int?
+  Education   Int?
+  Music       Int?
+  Philosophy  Int?
+  PoliticalScience Int?
+  Science     Int?
+  History     Int?
+  Law         Int?
+  Games       Int?
+  Books       Int?
+  FoodandDrink Int?
+  DataSource  Int?
+  WebTech     Int?
+  Economics   Int?
+  Medicine    Int?
+  @@index(fields: [id])
+}
+
+
