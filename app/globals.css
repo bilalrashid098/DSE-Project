@@ -120,3 +120,17 @@ body {
     text-wrap: balance;
   }
 }
+
+.customCheckboxGroup .customCheckbox {
+  padding-right: 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  width: 25%;
+}
+
+.customCheckboxGroup .customCheckbox input {
+  margin-right: 0.5rem;
+  height: 1.5rem;
+  width: 1.5rem;
+}

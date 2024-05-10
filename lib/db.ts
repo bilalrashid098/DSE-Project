@@ -4,7 +4,7 @@ export const adminDB = new AdminPrisma(
   {
     datasources: {
       db: {
-        url: `${process.env.DATABASE_URL}dse?retryWrites=true&w=majority`,
+        url: `${process.env.DATABASE_URL}dse?replicaSet=my-replica-set&retryWrites=true&w=majority`,
       },
     },
   }

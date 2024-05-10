@@ -1,81 +1,28 @@
 version: "3.7"
 
 services:
-  configsvr1:
+  mongodb1:
     image: mongo:latest
-    container_name: configsvr1
-    command: mongod --configsvr --replSet configReplSet --port 27017
+    container_name: mongodb1
     ports:
-      - "27017:27017"
+      - "27027:27017"  # Expose MongoDB default port for connection
     volumes:
-      - mongodb_configsvr1:/data/db
+      - mongodb1_data:/data/db  # Mount volume for MongoDB data persistence
+    command: mongod --replSet myReplicaSet  # Specify replica set name
 
-  configsvr2:
+  mongodb2:
     image: mongo:latest
-    container_name: configsvr2
-    command: mongod --configsvr --replSet configReplSet --port 27017
-    volumes:
-      - mongodb_configsvr2:/data/db
-
-  configsvr3:
-    image: mongo:latest
-    container_name: configsvr3
-    command: mongod --configsvr --replSet configReplSet --port 27017
-    volumes:
-      - mongodb_configsvr3:/data/db
-
-  mongos:
-    image: mongo:latest
-    container_name: mongos
-    command: mongos --configdb configReplSet/configsvr1:27017,configsvr2:27017,configsvr3:27017 --port 27017 --bind_ip_all
+    container_name: mongodb2
     ports:
-      - "27018:27017"
-    depends_on:
-      - configsvr1
-      - configsvr2
-      - configsvr3
-
-  shard1svr1:
-    image: mongo:latest
-    container_name: shard1svr1
-    command: mongod --shardsvr --replSet shard1ReplSet --port 27017
+      - "27028:27017"  # Expose MongoDB default port for connection
     volumes:
-      - mongodb_shard1svr1:/data/db
-    depends_on:
-      - mongos
-
-  shard1svr2:
-    image: mongo:latest
-    container_name: shard1svr2
-    command: mongod --shardsvr --replSet shard1ReplSet --port 27017
-    volumes:
-      - mongodb_shard1svr2:/data/db
-    depends_on:
-      - mongos
-
-  shard1svr3:
-    image: mongo:latest
-    container_name: shard1svr3
-    command: mongod --shardsvr --replSet shard1ReplSet --port 27017
-    volumes:
-      - mongodb_shard1svr3:/data/db
-    depends_on:
-      - mongos
-
-  # nodejs_app:
-  #   # Your Node.js app service configuration goes here
-  #   # Example:
-  #   image: your-nodejs-app-image
-  #   container_name: nodejs_app
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - mongos
+      - mongodb2_data:/data/db  # Mount volume for MongoDB data persistence
+    command: mongod --replSet myReplicaSet  # Specify replica set name
 
 volumes:
-  mongodb_configsvr1:
-  mongodb_configsvr2:
-  mongodb_configsvr3:
-  mongodb_shard1svr1:
-  mongodb_shard1svr2:
-  mongodb_shard1svr3:
+  mongodb1_data:  # Define volume for MongoDB data persistence
+  mongodb2_data:  # Define volume for MongoDB data persistence
+
+networks:
+  mongo-cluster:
+    driver: bridge
