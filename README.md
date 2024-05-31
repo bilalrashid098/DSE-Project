@@ -29,3 +29,5 @@ Required Commands:
 
 
 
+ENV VAR
+    - DATABASE_URL=mongodb://localhost:30001/
