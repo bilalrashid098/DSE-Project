@@ -1,28 +1,84 @@
-version: "3.7"
-
+version: "3.9"
 services:
-  mongodb1:
-    image: mongo:latest
-    container_name: mongodb1
+  mongo1:
+    image: mongo:6
+    command: [--replSet, my-replica-set, --bind_ip_all, --port, "30001"]
     ports:
-      - "27027:27017"  # Expose MongoDB default port for connection
-    volumes:
-      - mongodb1_data:/data/db  # Mount volume for MongoDB data persistence
-    command: mongod --replSet myReplicaSet  # Specify replica set name
+      - 30001:30001
+    healthcheck:
+      test: test $$(mongosh --port 30001 --quiet --eval "try {rs.initiate({_id:'my-replica-set',members:[{_id:0,host:\"mongo1:30001\"},{_id:1,host:\"mongo2:30002\"},{_id:2,host:\"mongo3:30003\"}]})} catch(e) {rs.status().ok}") -eq 1
+      interval: 10s
+      start_period: 30s
 
-  mongodb2:
-    image: mongo:latest
-    container_name: mongodb2
+  mongo2:
+    image: mongo:6
+    command: [--replSet, my-replica-set, --bind_ip_all, --port, "30002"]
     ports:
-      - "27028:27017"  # Expose MongoDB default port for connection
-    volumes:
-      - mongodb2_data:/data/db  # Mount volume for MongoDB data persistence
-    command: mongod --replSet myReplicaSet  # Specify replica set name
+      - 30002:30002
+    depends_on:
+      - mongo1
+    healthcheck:
+      test: test $$(mongosh --port 30002 --quiet --eval "rs.status().ok") -eq 1
+      interval: 10s
+      start_period: 30s
 
-volumes:
-  mongodb1_data:  # Define volume for MongoDB data persistence
-  mongodb2_data:  # Define volume for MongoDB data persistence
+  mongo3:
+    image: mongo:6
+    command: [--replSet, my-replica-set, --bind_ip_all, --port, "30003"]
+    ports:
+      - 30003:30003
+    depends_on:
+      - mongo1
+    healthcheck:
+      test: test $$(mongosh --port 30003 --quiet --eval "rs.status().ok") -eq 1
+      interval: 10s
+      start_period: 30s
 
-networks:
-  mongo-cluster:
-    driver: bridge
+  configsvr1:
+    image: mongo:6
+    command: ["mongod", "--configsvr", "--replSet", "configsvr-replica-set", "--bind_ip_all", "--port", "35001"]
+    ports:
+      - 35001:35001
+    healthcheck:
+      test: test $$(mongosh --port 35001 --quiet --eval "rs.status().ok") -eq 1
+      interval: 10s
+      start_period: 30s
+
+  configsvr2:
+    image: mongo:6
+    command: ["mongod", "--configsvr", "--replSet", "configsvr-replica-set", "--bind_ip_all", "--port", "35002"]
+    ports:
+      - 35002:35002
+    depends_on:
+      - configsvr1
+    healthcheck:
+      test: test $$(mongosh --port 35002 --quiet --eval "rs.status().ok") -eq 1
+      interval: 10s
+      start_period: 30s
+
+  configsvr3:
+    image: mongo:6
+    command: ["mongod", "--configsvr", "--replSet", "configsvr-replica-set", "--bind_ip_all", "--port", "35003"]
+    ports:
+      - 35003:35003
+    depends_on:
+      - configsvr1
+    healthcheck:
+      test: test $$(mongosh --port 35003 --quiet --eval "rs.status().ok") -eq 1
+      interval: 10s
+      start_period: 30s
+
+  mongos:
+    image: mongo:6
+    command: ["mongos", "--configdb", "configsvr-replica-set/configsvr1:35001,configsvr2:35002,configsvr3:35003", "--bind_ip_all", "--port", "27027"]
+    ports:
+      - 27027:27027
+    depends_on:
+      - mongo1
+      - configsvr1
+      - configsvr2
+      - configsvr3
+    healthcheck:
+      test: test $$(mongosh --port 27027 --quiet --eval "sh.status().ok") -eq 1
+      interval: 10s
+      start_period: 30s

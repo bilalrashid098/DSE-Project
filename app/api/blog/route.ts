@@ -1,5 +1,6 @@
 import { adminDB } from "@/lib/db";
 import { NextResponse, NextRequest } from "next/server";
+import { text } from "node:stream/consumers";
 
 interface RequestInterface {
   id?: string;
@@ -47,6 +48,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           OR: [
             { title: { contains: search, mode: "insensitive" } },
             { author: { contains: search.trim(), mode: "insensitive" } },
+            { text: { contains: search, mode: "insensitive" } },
           ],
         }
       : {};

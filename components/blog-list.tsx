@@ -33,7 +33,7 @@ export default function BlogList() {
       [id]: checked,
     }));
   };
-
+ 
   const getBlogs = async () => {
     const response: any = await fetch(`/api/blog`, {
       method: "POST",
@@ -52,7 +52,7 @@ export default function BlogList() {
 
   useEffect(() => {
     getBlogs();
-  }, [filters, search]);
+  }, [filters]);
 
   return (
     <div className="mb-8">
@@ -62,7 +62,17 @@ export default function BlogList() {
           type="text"
           placeholder="Search blog by title"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            if (e.target.value.length > 2) {
+              setSearch(e.target.value);
+              getBlogs();
+            } else if (e.target.value.length === 0) {
+              setSearch(e.target.value);
+              getBlogs();
+            } else {
+              setSearch(e.target.value);
+            }
+          }}
         />
         <div className="customCheckboxGroup flex flex-wrap mb-[1.5rem]">
           <div className="customCheckbox">
